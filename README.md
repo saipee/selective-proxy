@@ -11,6 +11,7 @@ npm install --save selective-proxy
 ## Usage
 
 Example:
+```
 require('selective-proxy')([{
     hosts:["maps.googleapis.com"],
     proxy: 'socks5://192.168.1.43:9999'
@@ -18,6 +19,7 @@ require('selective-proxy')([{
     hosts:["www.hotmail.com"],
     proxy: 'http://192.168.1.99:8023'
 }]);
+```
 
 The argument to the module can be either a single host-proxy combination, or an array of multiple combinations. The 'hosts' parameter too can be either a single host or an array of hosts to be used with the mentioned proxy. Proxies need to have protocols mentioned in the string, and need to be either HTTP(S) or SOCKS.
 
