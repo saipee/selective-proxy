@@ -33,16 +33,19 @@ module.exports = function (options) {
     // All-encompassing passthrough function
     function agentCallback(req, opts) {
 
-        if (toBeProxied(opts.host.toLowerCase(), newOptions)) {
-            // if host of the request is in the array of hosts, pass request on to the proxy, and use that agent
-            return newOptions.proxies[newOptions.hosts[opts.host.toLowerCase()]][opts.uri.protocol];
-        } else {
-            // No more proxy. Use original HTTP agent
-            return originalAgents[opts.uri.protocol];
+        try {
+            if (toBeProxied(opts.host.toLowerCase(), newOptions)) {
+                // if host of the request is in the array of hosts, pass request on to the proxy, and use that agent
+                return newOptions.proxies[newOptions.hosts[opts.host.toLowerCase()]][opts.uri.protocol];
+            } else {
+                // No more proxy. Use original HTTP agent
+                throw "Host doesn't need to be proxied. Defaulting to no proxy. ";
+            }
+        } catch (e) {
+            if (opts.uri) return originalAgents[opts.uri.protocol];
+            return originalAgents["http:"];
+
         }
-
-
-
     }
 
 }
@@ -64,7 +67,7 @@ function assembleHosts(options) {
         collection.hosts = collection.hosts.length ? collection.hosts : [collection.hosts];
 
         collection.hosts.forEach(function (host) {
-            ret[host] = 'i'+proxyIndex;
+            ret[host] = 'i' + proxyIndex;
         });
     });
     return ret;
@@ -74,7 +77,7 @@ function assembleProxies(options) {
     var ret = {};
     options.forEach(function (element, ind) {
         var elementURL = new URL(element.proxy);
-        ret['i'+ind] = {
+        ret['i' + ind] = {
             "http:": elementURL.protocol.includes("http") ? new HttpProxyAgent(element.proxy) : new SocksProxyAgent(element.proxy),
             "https:": elementURL.protocol.includes("http") ? new HttpsProxyAgent(element.proxy) : new SocksProxyAgent(element.proxy),
         };
